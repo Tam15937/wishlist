@@ -72,20 +72,34 @@ function renderWishlist() {
     html += '</ul>';
     block.innerHTML = html;
 
-    block.querySelectorAll('input[type=checkbox]').forEach(checkbox => {
-        checkbox.addEventListener('change', async (e) => {
-            const idx = e.target.getAttribute('data-index');
-            try {
-                const res = await fetch(`/api/toggle_item/${selectedUserId}/${idx}`, {
-                    method: 'POST'
-                });
-                if (!res.ok) throw new Error('Ошибка при обновлении');
-            } catch (err) {
-                alert('Ошибка при отметке подарка');
-                e.target.checked = !e.target.checked;
-            }
-        });
-    });
+	block.querySelectorAll('input[type=checkbox]').forEach(checkbox => {
+		checkbox.addEventListener('change', async (e) => {
+			const idx = e.target.getAttribute('data-index');
+			try {
+				const res = await fetch(`/api/toggle_item/${selectedUserId}/${idx}`, {
+					method: 'POST'
+				});
+				if (!res.ok) {
+					// Попытка получить сообщение об ошибке из тела ответа
+					let errorMsg = 'Ошибка при отметке подарка';
+					try {
+						const data = await res.json();
+						if (data && data.error) {
+							errorMsg = data.error;
+						}
+					} catch (_) {
+						// Не удалось распарсить JSON — оставляем общее сообщение
+					}
+					throw new Error(errorMsg);
+				}
+				// Обновление придёт через WebSocket, здесь ничего не делаем
+			} catch (err) {
+				alert(err.message);
+				// Откатываем состояние чекбокса при ошибке
+				e.target.checked = !e.target.checked;
+			}
+		});
+	});
 }
 
 function getCookie(name) {
