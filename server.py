@@ -194,22 +194,39 @@ def toggle_item(list_id, item_index):
         for w in wishlists:
             if w['id'] == list_id:
                 if 0 <= item_index < len(w['wishlist']):
-                    current = w['wishlist'][item_index].get('taken', False)
-                    new_taken = not current
-                    w['wishlist'][item_index]['taken'] = new_taken
-                    if new_taken:
-                        # Добавляем поле, кто взял подарок
-                        w['wishlist'][item_index]['taken_by_user_id'] = current_user_id
+                    item = w['wishlist'][item_index]
+                    current_taken = item.get('taken', False)
+                    new_taken = not current_taken
+
+                    # Проверяем логику прав:
+                    if current_taken and new_taken == False:
+                        # Снимают галочку — можно только если current_user_id == taken_by_user_id
+                        taken_by = item.get('taken_by_user_id')
+                        if taken_by != current_user_id:
+                            return jsonify({'error': 'Недостаточно прав для снятия отметки'}), 403
+                        # Разрешаем снять отметку
+                        item['taken'] = False
+                        item.pop('taken_by_user_id', None)
+
+                    elif not current_taken and new_taken == True:
+                        # Любой может поставить отметку, записываем current_user_id
+                        item['taken'] = True
+                        item['taken_by_user_id'] = current_user_id
+
                     else:
-                        # Удаляем поле, если подарок помечен как свободный
-                        w['wishlist'][item_index].pop('taken_by_user_id', None)
+                        # В остальных случаях (например, toggle с true на true) — просто игнорируем или возвращаем ошибку
+                        # Здесь можно либо игнорировать (не менять), либо вернуть ошибку
+                        # Мы сделаем игнор, чтобы не ломать логику
+                        pass
+
                     save_wishlists()
                     socketio.emit('update')
                     return jsonify({'status': 'ok'}), 200
                 else:
                     return jsonify({'error': 'Индекс вне диапазона'}), 400
-        return jsonify({'error': 'Список не найден'}), 404
 
+        return jsonify({'error': 'Список не найден'}), 404
+        
 @socketio.on('connect')
 def on_connect():
     print('Клиент подключился')
