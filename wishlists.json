@@ -1,46 +1,25 @@
 [
   {
-    "id": 1754740152537,
-    "name": "Катя",
-    "wishlist": [
-      {
-        "name": "2",
-        "taken": false
-      },
-      {
-        "name": "2",
-        "taken": false
-      },
-      {
-        "name": "2",
-        "taken": false
-      }
-    ],
-    "user_id": 1754739154746,
-    "username": "Катя"
-  },
-  {
-    "id": 1754740172260,
+    "id": 1754740997377,
     "name": "Бажен",
     "wishlist": [
       {
         "name": "1",
-        "taken": true
+        "taken": true,
+        "taken_by_user_id": 1754740960440
       },
       {
         "name": "1",
-        "taken": true
+        "taken": true,
+        "taken_by_user_id": 1754740985962
       },
       {
         "name": "1",
-        "taken": false
-      },
-      {
-        "name": "1",
-        "taken": false
+        "taken": true,
+        "taken_by_user_id": 1754740960440
       }
     ],
-    "user_id": 1754739160412,
+    "user_id": 1754740960440,
     "username": "Бажен"
   }
 ]

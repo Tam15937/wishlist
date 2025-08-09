@@ -187,12 +187,22 @@ def toggle_item(list_id, item_index):
     if not is_authenticated():
         return jsonify({'error': 'Неавторизован'}), 403
 
+    current_user = request.cookies.get('username')
+    current_user_id = users_auth[current_user]['id']
+
     with wishlist_lock:
         for w in wishlists:
             if w['id'] == list_id:
                 if 0 <= item_index < len(w['wishlist']):
                     current = w['wishlist'][item_index].get('taken', False)
-                    w['wishlist'][item_index]['taken'] = not current
+                    new_taken = not current
+                    w['wishlist'][item_index]['taken'] = new_taken
+                    if new_taken:
+                        # Добавляем поле, кто взял подарок
+                        w['wishlist'][item_index]['taken_by_user_id'] = current_user_id
+                    else:
+                        # Удаляем поле, если подарок помечен как свободный
+                        w['wishlist'][item_index].pop('taken_by_user_id', None)
                     save_wishlists()
                     socketio.emit('update')
                     return jsonify({'status': 'ok'}), 200

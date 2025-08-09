@@ -42,7 +42,7 @@ function renderUsers() {
         li.textContent = user.name || '(без названия)';
         li.className = (user.id === selectedUserId) ? 'selected' : '';
         li.onclick = () => {
-            selectedUserId = user.id; // это id списка
+            selectedUserId = user.id; // id списка
             renderUsers();
             renderWishlist();
             renderDeleteButton();
@@ -50,6 +50,7 @@ function renderUsers() {
         ul.appendChild(li);
     });
 }
+
 
 function renderWishlist() {
     const block = document.getElementById('wishlistContent');
@@ -109,7 +110,6 @@ function renderDeleteButton() {
 
     if (!user.user_id || !currentUserId) return;
 
-    // Сравниваем по id (строки или числа) без учета регистра — для id это неважно
     if (String(currentUserId) !== String(user.user_id)) return;
 
     const btn = document.createElement('button');
