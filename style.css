@@ -1,0 +1,123 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f7f7fa;
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+}
+
+.sidebar {
+    background: #f0f0f0;
+    padding: 24px 16px;
+    width: 240px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.sidebar.left {
+    border-right: 1px solid #ddd;
+}
+
+.sidebar.right {
+    border-left: 1px solid #ddd;
+    align-items: flex-end;
+}
+
+.main-content {
+    flex: 1;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    background: #fff;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+#userItems {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#userItems li {
+    padding: 8px 12px;
+    margin-bottom: 6px;
+    background: #e7e7ef;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#userItems li.selected, #userItems li:hover {
+    background: #b2d8ff;
+}
+
+#wishlistContent ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+#wishlistContent li {
+    margin-bottom: 8px;
+}
+
+.taken {
+    text-decoration: line-through;
+    color: #888;
+}
+
+form#createListForm {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 400px;
+}
+
+form#createListForm input[type="text"],
+form#createListForm input[type="password"] {
+    padding: 8px;
+    font-size: 1em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button.addGiftBtn, button.saveListBtn {
+    background-color: #2196f3;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button.addGiftBtn:hover, button.saveListBtn:hover {
+    background-color: #0b7dda;
+}
+
+.giftInput {
+    padding: 8px;
+    font-size: 1em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 6px;
+}
+
+button {
+    margin-top: 8px;
+    padding: 8px 18px;
+    border: none;
+    border-radius: 4px;
+    background: #2196f3;
+    color: #fff;
+    cursor: pointer;
+    font-size: 1em;
+}
+
+button:disabled {
+    background: #aaa;
+}

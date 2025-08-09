@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <title>Вход в Wishlist Hub</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div class="container" style="justify-content: center; align-items: center;">
+        <form id="loginForm" style="max-width: 400px; width: 100%;">
+            <h2>Введите имя и пароль</h2>
+            <input type="text" id="username" placeholder="Имя пользователя" required />
+            <input type="password" id="password" placeholder="Пароль" required />
+            <button type="submit">Войти</button>
+            <p id="errorMsg" style="color: red;"></p>
+        </form>
+    </div>
+
+    <script>
+    document.getElementById('loginForm').onsubmit = async e => {
+        e.preventDefault();
+
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value;
+
+        if (!username || !password) {
+            document.getElementById('errorMsg').textContent = 'Введите имя и пароль!';
+            return;
+        }
+        try {
+            const resp = await fetch('/login', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({username, password})
+            });
+            const data = await resp.json();
+            if (resp.ok) {
+                window.location.href = '/';
+            } else {
+                document.getElementById('errorMsg').textContent = data.error || 'Ошибка входа';
+            }
+        } catch (err) {
+            document.getElementById('errorMsg').textContent = 'Ошибка сети';
+        }
+    }
+    </script>
+</body>
+</html>
