@@ -134,6 +134,14 @@ def mobile_style_css():
 @app.route('/mobile_script.js')
 def mobile_script_js():
     return send_from_directory('.', 'mobile_script.js')
+    
+@app.route('/login_style.css')
+def login_style():
+    return send_from_directory('.', 'login_style.css')
+
+@app.route('/login_script.js')
+def login_script():
+    return send_from_directory('.', 'login_script.js')
 
 # --- API ---
 
