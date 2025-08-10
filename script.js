@@ -130,16 +130,27 @@ function renderDeleteButton() {
     if (!user.user_id || !currentUserId) return;
     if (String(currentUserId) !== String(user.user_id)) return;
 
-    const btn = document.createElement('button');
-    btn.textContent = 'Удалить список';
-    btn.style.backgroundColor = '#e53935';
-    btn.style.marginTop = '10px';
-    btn.onclick = () => {
+    // Кнопка "Редактировать список"
+    const editBtn = document.createElement('button');
+    editBtn.textContent = 'Редактировать список';
+    editBtn.style.backgroundColor = '#4caf50'; // зеленая
+    editBtn.style.color = 'white';
+    editBtn.style.marginBottom = '10px';
+    editBtn.onclick = () => {
+        showEditListForm(user);
+    };
+    deleteSection.appendChild(editBtn);
+
+    // Кнопка "Удалить список"
+    const delBtn = document.createElement('button');
+    delBtn.textContent = 'Удалить список';
+    delBtn.style.backgroundColor = '#e53935';
+    delBtn.onclick = () => {
         if (confirm('Вы уверены, что хотите удалить свой список?')) {
             deleteList(selectedUserId);
         }
     };
-    deleteSection.appendChild(btn);
+    deleteSection.appendChild(delBtn);
 }
 
 async function deleteList(id) {
@@ -164,14 +175,14 @@ async function deleteList(id) {
 
 function showCreateListForm() {
     const block = document.getElementById('wishlistContent');
-    block.innerHTML = `
-        <form id="createListForm">
-            <input type="text" id="listName" placeholder="Название списка" required />
-            <div id="giftsContainer"></div>
-            <button type="button" class="addGiftBtn">Добавить подарок</button>
-            <button type="submit" class="saveListBtn">Сохранить лист</button>
-        </form>
-    `;
+	block.innerHTML = `
+		<form id="createListForm">
+			<input type="text" id="listName" placeholder="Название списка" maxlength="30" required />
+			<div id="giftsContainer"></div>
+			<button type="button" class="addGiftBtn">Добавить подарок</button>
+			<button type="submit" class="saveListBtn">Сохранить лист</button>
+		</form>
+	`;
 
     const giftsContainer = document.getElementById('giftsContainer');
     const addGiftBtn = block.querySelector('.addGiftBtn');
@@ -229,7 +240,94 @@ function showCreateListForm() {
     };
 }
 
-function addGiftInput() {
+function showEditListForm(list) {
+    const block = document.getElementById('wishlistContent');
+    block.innerHTML = `
+        <form id="editListForm">
+            <input type="text" id="listName" placeholder="Название списка" maxlength="30" required />
+            <div id="giftsContainer"></div>
+            <button type="button" class="addGiftBtn">Добавить подарок</button>
+            <button type="submit" class="saveListBtn">Сохранить изменения</button>
+        </form>
+    `;
+
+    const giftsContainer = document.getElementById('giftsContainer');
+    const addGiftBtn = block.querySelector('.addGiftBtn');
+    const form = block.querySelector('#editListForm');
+
+    // Заполняем поля из существующего списка
+    document.getElementById('listName').value = list.name || '';
+
+    if (Array.isArray(list.wishlist) && list.wishlist.length > 0) {
+        list.wishlist.forEach((item, i) => {
+            addGiftInput(item.name, item.link);
+        });
+    } else {
+        addGiftInput();
+    }
+
+    addGiftBtn.onclick = () => {
+        addGiftInput();
+    };
+
+    form.onsubmit = async (e) => {
+        e.preventDefault();
+        const listName = document.getElementById('listName').value.trim();
+        if (!listName) {
+            alert("Введите название списка!");
+            return;
+        }
+
+        const giftBlocks = giftsContainer.querySelectorAll('.giftBlock');
+        const gifts = [];
+
+        for (const block of giftBlocks) {
+            const nameInput = block.querySelector('.giftInputName');
+            const linkInput = block.querySelector('.giftInputLink');
+            const nameVal = nameInput.value.trim();
+            let linkVal = linkInput.value.trim();
+            if (nameVal) {
+                if (linkVal && !/^https?:\/\//i.test(linkVal)) {
+                    alert("Ссылка должна начинаться с http:// или https:// или быть пустой");
+                    return;
+                }
+                gifts.push({ name: nameVal, taken: false, link: linkVal });
+            }
+        }
+        if (gifts.length === 0) {
+            alert("Добавьте хотя бы один подарок!");
+            return;
+        }
+
+        try {
+            // Создаем новый список с обновленными данными
+            const createResp = await fetch('/api/create_list', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: listName, wishlist: gifts })
+            });
+            if (!createResp.ok) throw new Error('Ошибка при сохранении');
+
+            // Удаляем старый список
+            const deleteResp = await fetch(`/api/delete_list/${list.id}`, { method: 'POST' });
+            if (!deleteResp.ok) {
+                alert('Ошибка при удалении старого списка после редактирования');
+            } else {
+                alert('Список успешно обновлён!');
+            }
+
+            selectedUserId = null;
+            await loadUsers();
+            renderWishlist();
+            renderDeleteButton();
+
+        } catch (err) {
+            alert('Ошибка: ' + err.message);
+        }
+    };
+}
+
+function addGiftInput(name = '', link = '') {
     const giftsContainer = document.getElementById('giftsContainer');
     const block = document.createElement('div');
     block.className = 'giftBlock';
@@ -242,12 +340,15 @@ function addGiftInput() {
     inputName.className = 'giftInputName';
     inputName.placeholder = `Подарок ${giftsContainer.children.length + 1}`;
     inputName.style.flex = '1';
+    inputName.maxLength = 40;  // ограничение в 40 символов
+    inputName.value = name;    // подставляем имя, если есть
 
     const inputLink = document.createElement('input');
     inputLink.type = 'text';
     inputLink.className = 'giftInputLink';
     inputLink.placeholder = 'Ссылка (опционально)';
     inputLink.style.width = '200px';
+    inputLink.value = link;    // подставляем ссылку, если есть
 
     block.appendChild(inputName);
     block.appendChild(inputLink);
