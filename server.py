@@ -126,6 +126,14 @@ def style_css():
 @app.route('/script.js')
 def script_js():
     return send_from_directory('.', 'script.js')
+    
+@app.route('/mobile_style.css')
+def mobile_style_css():
+    return send_from_directory('.', 'mobile_style.css')
+
+@app.route('/mobile_script.js')
+def mobile_script_js():
+    return send_from_directory('.', 'mobile_script.js')
 
 # --- API ---
 

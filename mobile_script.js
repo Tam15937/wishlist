@@ -21,7 +21,6 @@ async function loadUsers() {
         const res = await fetch('/api/users');
         if (!res.ok) throw new Error('Неавторизован');
         users = await res.json();
-        console.log('Полученные списки:', users);
         renderUsers();
         renderWishlist();
         renderDeleteButton();
@@ -42,7 +41,7 @@ function renderUsers() {
         li.textContent = user.name || '(без названия)';
         li.className = (user.id === selectedUserId) ? 'selected' : '';
         li.onclick = () => {
-            selectedUserId = user.id; // id списка
+            selectedUserId = user.id;
             renderUsers();
             renderWishlist();
             renderDeleteButton();
@@ -51,7 +50,6 @@ function renderUsers() {
     });
 }
 
-
 function renderWishlist() {
     const block = document.getElementById('wishlistContent');
     const user = users.find(u => u.id === selectedUserId);
@@ -59,6 +57,7 @@ function renderWishlist() {
         block.innerHTML = '<p>Выберите пользователя слева, чтобы увидеть его wishlist.</p>';
         return;
     }
+
     let html = `<h2>Wishlist: ${user.name}</h2><ul>`;
     user.wishlist.forEach((item, index) => {
         const checked = item.taken ? 'checked' : '';
@@ -72,40 +71,31 @@ function renderWishlist() {
     html += '</ul>';
     block.innerHTML = html;
 
-	block.querySelectorAll('input[type=checkbox]').forEach(checkbox => {
-		checkbox.addEventListener('change', async (e) => {
-			const idx = e.target.getAttribute('data-index');
-			try {
-				const res = await fetch(`/api/toggle_item/${selectedUserId}/${idx}`, {
-					method: 'POST'
-				});
-				if (!res.ok) {
-					// Попытка получить сообщение об ошибке из тела ответа
-					let errorMsg = 'Ошибка при отметке подарка';
-					try {
-						const data = await res.json();
-						if (data && data.error) {
-							errorMsg = data.error;
-						}
-					} catch (_) {
-						// Не удалось распарсить JSON — оставляем общее сообщение
-					}
-					throw new Error(errorMsg);
-				}
-				// Обновление придёт через WebSocket, здесь ничего не делаем
-			} catch (err) {
-				alert(err.message);
-				// Откатываем состояние чекбокса при ошибке
-				e.target.checked = !e.target.checked;
-			}
-		});
-	});
+    block.querySelectorAll('input[type=checkbox]').forEach(checkbox => {
+        checkbox.addEventListener('change', async (e) => {
+            const idx = e.target.getAttribute('data-index');
+            try {
+                const res = await fetch(`/api/toggle_item/${selectedUserId}/${idx}`, { method: 'POST' });
+                if (!res.ok) {
+                    let errorMsg = 'Ошибка при отметке подарка';
+                    try {
+                        const data = await res.json();
+                        if (data && data.error) errorMsg = data.error;
+                    } catch(_){ /* ignore JSON parse errors */ }
+                    throw new Error(errorMsg);
+                }
+            } catch (err) {
+                alert(err.message);
+                e.target.checked = !e.target.checked;
+            }
+        });
+    });
 }
 
 function getCookie(name) {
     const cookieStr = document.cookie;
-    const cookies = cookieStr.split('; ').reduce((acc, current) => {
-        const [key, val] = current.split('=');
+    const cookies = cookieStr.split('; ').reduce((acc, cur) => {
+        const [key, val] = cur.split('=');
         acc[key] = decodeURIComponent(val);
         return acc;
     }, {});
@@ -121,13 +111,13 @@ function renderDeleteButton() {
     if (!user) return;
 
     const currentUserId = getCookie('user_id');
+
     if (!user.user_id || !currentUserId) return;
+
     if (String(currentUserId) !== String(user.user_id)) return;
 
     const btn = document.createElement('button');
     btn.textContent = 'Удалить список';
-    btn.style.backgroundColor = '#e53935';
-    btn.style.marginTop = '10px';
     btn.onclick = () => {
         if (confirm('Вы уверены, что хотите удалить свой список?')) {
             deleteList(selectedUserId);
@@ -140,7 +130,7 @@ async function deleteList(id) {
     try {
         const res = await fetch(`/api/delete_list/${id}`, { method: 'POST' });
         if (res.ok) {
-            alert('Список успешно удалён');
+            //alert('Список успешно удалён');
             selectedUserId = null;
             await loadUsers();
             document.getElementById('wishlistContent').innerHTML = '<p>Выберите пользователя слева, чтобы увидеть его wishlist.</p>';
@@ -177,7 +167,7 @@ function showCreateListForm() {
         addGiftInput();
     };
 
-    form.onsubmit = async (e) => {
+    form.onsubmit = async e => {
         e.preventDefault();
         const listName = document.getElementById('listName').value.trim();
         if (!listName) {
@@ -202,7 +192,7 @@ function showCreateListForm() {
                 body: JSON.stringify({ name: listName, wishlist: gifts })
             });
             if (!response.ok) throw new Error('Ошибка при сохранении');
-            alert('Список успешно сохранён!');
+            //alert('Список успешно сохранён!');
             selectedUserId = null;
             await loadUsers();
             renderWishlist();
@@ -222,11 +212,24 @@ function addGiftInput() {
     giftsContainer.appendChild(input);
 }
 
-document.getElementById('createListBtn').onclick = () => {
-    selectedUserId = null;
-    renderUsers();
-    showCreateListForm();
-};
+document.addEventListener('DOMContentLoaded', () => {
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.onclick = () => {
+            document.cookie = "username=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+            document.cookie = "user_id=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+            window.location.href = '/login';
+        };
+    }
 
-// Инициализация
-loadUsers();
+    const createListBtn = document.getElementById('createListBtn');
+    if (createListBtn) {
+        createListBtn.onclick = () => {
+            selectedUserId = null;
+            renderUsers();
+            showCreateListForm();
+        };
+    }
+
+    loadUsers();
+});

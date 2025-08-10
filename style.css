@@ -80,10 +80,11 @@ form#createListForm {
 
 form#createListForm input[type="text"],
 form#createListForm input[type="password"] {
-    padding: 8px;
-    font-size: 1em;
+	padding: 10px;      /* увеличиваем внутренние отступы */
+    font-size: 1.1em;
     border: 1px solid #ccc;
     border-radius: 4px;
+
 }
 
 button.addGiftBtn, button.saveListBtn {

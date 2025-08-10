@@ -1,0 +1,215 @@
+/* Базовые стили */
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f7f7fa;
+    font-size: 24px; /* 16px * 1.5 = 24px */
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+    flex-direction: row;
+}
+
+/* Левая панель — пользователи */
+
+.sidebar.left {
+    width: 40%;
+    min-width: 240px; /* по желанию, чтобы не сжималась слишком сильно */
+    background: #f0f0f0;
+    padding: 36px 24px;
+    box-sizing: border-box;
+    border-right: 1px solid #ddd;
+
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    overflow-y: auto;
+}
+
+/* Правая колонка */
+
+.right-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 30px; /* 20px * 1.5 */
+    box-sizing: border-box;
+    background: #fff;
+    border-left: 1px solid #ddd;
+    overflow-y: auto;
+}
+
+/* Кнопки сверху во второй колонке */
+
+.right-buttons {
+    display: flex;
+    gap: 15px; /* 10px * 1.5 */
+    margin-bottom: 30px; /* 20px * 1.5 */
+}
+
+.right-buttons button {
+    flex: 1;
+    border: none;
+    border-radius: 6px; /* 4px * 1.5 → округлено */
+    cursor: pointer;
+    font-size: 1.5em; /* 1em * 1.5 */
+    padding: 15px 27px; /* 10px *1.5, 18px *1.5 */
+    color: #fff;
+    transition: background-color 0.2s ease-in-out;
+}
+
+#logoutBtn {
+    background-color: #f44336;
+}
+
+#logoutBtn:hover {
+    background-color: #d32f2f;
+}
+
+#createListBtn {
+    background-color: #2196f3;
+}
+
+#createListBtn:hover {
+    background-color: #0b7dda;
+}
+
+/* Основное содержимое */
+
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+/* Список Wishlist */
+
+#wishlistContent {
+    width: 100%;
+}
+
+#wishlistContent ul {
+    list-style-type: none;
+    padding-left: 0;
+    margin-bottom: 18px; /* 12px * 1.5 */
+}
+
+#wishlistContent li {
+    margin-bottom: 12px; /* 8px * 1.5 */
+    font-size: 1.5em; /* 1em * 1.5 */
+}
+
+.taken {
+    text-decoration: line-through;
+    color: #888;
+}
+
+/* Список пользователей слева */
+
+#userItems {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#userItems li {
+    padding: 12px 18px; /* 8px * 1.5, 12px * 1.5 */
+    margin-bottom: 9px; /* 6px * 1.5 */
+    background: #e7e7ef;
+    border-radius: 8px; /* 5px * 1.5 ≈ 7.5 округляем */
+    cursor: pointer;
+    transition: background 0.2s;
+    font-size: 1.5em; /* 1em * 1.5 */
+}
+
+#userItems li.selected,
+#userItems li:hover {
+    background: #b2d8ff;
+}
+
+/* Кнопка удалить — под списком */
+
+#deleteSection {
+    width: 100%;
+    margin-top: 22px; /* 15px * 1.5 */
+}
+
+#deleteSection button {
+    width: 100%;
+    background-color: #e53935;
+    border: none;
+    border-radius: 6px; /* 4px * 1.5 */
+    color: white;
+    font-size: 1.5em; /* 1em * 1.5 */
+    padding: 18px; /* 12px * 1.5 */
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: background-color 0.2s ease-in-out;
+}
+
+#deleteSection button:hover {
+    background-color: #b71c1c;
+}
+
+/* Формы для создания листа (если используются) */
+
+form#createListForm {
+    display: flex;
+    flex-direction: column;
+    gap: 18px; /* 12px * 1.5 */
+    max-width: 600px; /* 400px * 1.5 = 600 */
+    margin-top: 15px; /* 10px * 1.5 */
+}
+
+form#createListForm input[type="text"],
+form#createListForm input[type="password"] {
+    padding: 12px; /* 8px * 1.5 */
+    font-size: 1.5em; /* 1em * 1.5 */
+    border: 1px solid #ccc;
+    border-radius: 6px; /* 4px * 1.5 */
+}
+
+button.addGiftBtn,
+button.saveListBtn {
+    background-color: #2196f3;
+    color: white;
+    border: none;
+    padding: 15px; /* 10px * 1.5 */
+    border-radius: 8px; /* 5px * 1.5 ≈ 7.5 округляем */
+    cursor: pointer;
+    font-size: 1.5em; /* 1em * 1.5 */
+}
+
+button.addGiftBtn:hover,
+button.saveListBtn:hover {
+    background-color: #0b7dda;
+}
+
+.giftInput {
+    padding: 12px; /* 8px * 1.5 */
+    font-size: 1.5em; /* 1em * 1.5 */
+    border: 1px solid #ccc;
+    border-radius: 6px; /* 4px * 1.5 */
+    margin-bottom: 9px; /* 6px * 1.5 */
+}
+
+/* Кнопка общая */
+
+button {
+    margin-top: 12px; /* 8px * 1.5 */
+    padding: 12px 27px; /* 8px * 1.5, 18px * 1.5 */
+    border: none;
+    border-radius: 6px; /* 4px *1.5 */
+    background: #2196f3;
+    color: #fff;
+    cursor: pointer;
+    font-size: 1.5em; /* 1em * 1.5 */
+}
+
+button:disabled {
+    background: #aaa;
+}
