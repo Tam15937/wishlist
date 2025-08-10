@@ -62,44 +62,50 @@ function renderWishlist() {
     let html = `<h2>Wishlist: ${user.name}</h2><ul>`;
     user.wishlist.forEach((item, index) => {
         const checked = item.taken ? 'checked' : '';
+        // Проверяем валидность ссылки
+        let linkHtml = '';
+        if (item.link && typeof item.link === 'string' && item.link.trim() !== '' && /^https?:\/\//i.test(item.link.trim())) {
+            const urlEscaped = item.link.trim().replace(/"/g, '&quot;');
+            linkHtml = `<a href="${urlEscaped}" target="_blank" rel="noopener noreferrer" 
+                          style="margin-left: 12px; padding: 2px 6px; border: 1px solid #2196f3; border-radius: 3px; font-size: 0.9em; color: #2196f3; text-decoration: none;">
+                          ссылка
+                        </a>`;
+        }
         html += `<li>
-            <label>
+            <label style="display:flex; align-items:center;">
                 <input type="checkbox" data-index="${index}" ${checked} />
-                <span class="${item.taken ? 'taken' : ''}">${item.name}</span>
+                <span class="${item.taken ? 'taken' : ''}" style="margin-left: 8px;">${item.name}</span>
+                ${linkHtml}
             </label>
         </li>`;
     });
     html += '</ul>';
     block.innerHTML = html;
 
-	block.querySelectorAll('input[type=checkbox]').forEach(checkbox => {
-		checkbox.addEventListener('change', async (e) => {
-			const idx = e.target.getAttribute('data-index');
-			try {
-				const res = await fetch(`/api/toggle_item/${selectedUserId}/${idx}`, {
-					method: 'POST'
-				});
-				if (!res.ok) {
-					// Попытка получить сообщение об ошибке из тела ответа
-					let errorMsg = 'Ошибка при отметке подарка';
-					try {
-						const data = await res.json();
-						if (data && data.error) {
-							errorMsg = data.error;
-						}
-					} catch (_) {
-						// Не удалось распарсить JSON — оставляем общее сообщение
-					}
-					throw new Error(errorMsg);
-				}
-				// Обновление придёт через WebSocket, здесь ничего не делаем
-			} catch (err) {
-				alert(err.message);
-				// Откатываем состояние чекбокса при ошибке
-				e.target.checked = !e.target.checked;
-			}
-		});
-	});
+    block.querySelectorAll('input[type=checkbox]').forEach(checkbox => {
+        checkbox.addEventListener('change', async (e) => {
+            const idx = e.target.getAttribute('data-index');
+            try {
+                const res = await fetch(`/api/toggle_item/${selectedUserId}/${idx}`, {
+                    method: 'POST'
+                });
+                if (!res.ok) {
+                    let errorMsg = 'Ошибка при отметке подарка';
+                    try {
+                        const data = await res.json();
+                        if (data && data.error) {
+                            errorMsg = data.error;
+                        }
+                    } catch (_) {}
+                    throw new Error(errorMsg);
+                }
+                // Обновление через WebSocket придёт
+            } catch (err) {
+                alert(err.message);
+                e.target.checked = !e.target.checked;
+            }
+        });
+    });
 }
 
 function getCookie(name) {
@@ -184,11 +190,21 @@ function showCreateListForm() {
             alert("Введите название списка!");
             return;
         }
-        const giftInputs = giftsContainer.querySelectorAll('.giftInput');
+        const giftBlocks = giftsContainer.querySelectorAll('.giftBlock');
         const gifts = [];
-        for (const input of giftInputs) {
-            const val = input.value.trim();
-            if (val) gifts.push({ name: val, taken: false });
+        for (const block of giftBlocks) {
+            const nameInput = block.querySelector('.giftInputName');
+            const linkInput = block.querySelector('.giftInputLink');
+            const nameVal = nameInput.value.trim();
+            let linkVal = linkInput.value.trim();
+            if (nameVal) {
+                // Проверка валидности ссылки: либо пустое, либо начинается с http:// или https://
+                if (linkVal && !/^https?:\/\//i.test(linkVal)) {
+                    alert("Ссылка должна начинаться с http:// или https:// или быть пустой");
+                    return;
+                }
+                gifts.push({ name: nameVal, taken: false, link: linkVal });
+            }
         }
         if (gifts.length === 0) {
             alert("Добавьте хотя бы один подарок!");
@@ -215,11 +231,28 @@ function showCreateListForm() {
 
 function addGiftInput() {
     const giftsContainer = document.getElementById('giftsContainer');
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.className = 'giftInput';
-    input.placeholder = `Подарок ${giftsContainer.children.length + 1}`;
-    giftsContainer.appendChild(input);
+    const block = document.createElement('div');
+    block.className = 'giftBlock';
+    block.style.display = 'flex';
+    block.style.gap = '8px';
+    block.style.marginBottom = '6px';
+
+    const inputName = document.createElement('input');
+    inputName.type = 'text';
+    inputName.className = 'giftInputName';
+    inputName.placeholder = `Подарок ${giftsContainer.children.length + 1}`;
+    inputName.style.flex = '1';
+
+    const inputLink = document.createElement('input');
+    inputLink.type = 'text';
+    inputLink.className = 'giftInputLink';
+    inputLink.placeholder = 'Ссылка (опционально)';
+    inputLink.style.width = '200px';
+
+    block.appendChild(inputName);
+    block.appendChild(inputLink);
+
+    giftsContainer.appendChild(block);
 }
 
 document.getElementById('createListBtn').onclick = () => {
