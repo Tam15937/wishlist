@@ -121,3 +121,59 @@ button {
 button:disabled {
     background: #aaa;
 }
+
+@media (min-width: 1200px) {
+    body {
+        font-size: 20px; /* увеличиваем общий размер шрифта */
+    }
+
+    button {
+        font-size: 1.2em;   /* увеличиваем шрифт кнопок */
+        padding: 12px 24px; /* увеличиваем padding для кнопок */
+    }
+
+    input[type="text"],
+    input[type="password"] {
+        font-size: 1.1em;   /* увеличиваем шрифт в полях ввода */
+        padding: 10px;      /* увеличиваем внутренние отступы */
+    }
+
+    /* При необходимости увеличиваем заголовки */
+    h2 {
+        font-size: 1.5em;
+    }
+
+    /* Если хотите, чтобы элементы списка пользователей были чуть больше */
+    #userItems li {
+        font-size: 1.1em;
+        padding: 12px 16px;
+    }
+}
+
+@media (min-width: 2000px) {
+    body {
+        font-size: 24px; /* увеличиваем общий размер шрифта */
+    }
+
+    button {
+        font-size: 1.5em;   /* увеличиваем шрифт кнопок */
+        padding: 12px 24px; /* увеличиваем padding для кнопок */
+    }
+
+    input[type="text"],
+    input[type="password"] {
+        font-size: 1.5em;   /* увеличиваем шрифт в полях ввода */
+        padding: 10px;      /* увеличиваем внутренние отступы */
+    }
+
+    /* При необходимости увеличиваем заголовки */
+    h2 {
+        font-size: 1.8em;
+    }
+
+    /* Если хотите, чтобы элементы списка пользователей были чуть больше */
+    #userItems li {
+        font-size: 1.5em;
+        padding: 12px 16px;
+    }
+}

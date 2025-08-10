@@ -103,7 +103,21 @@ def login_post():
 def index():
     if not is_authenticated():
         return redirect('/login')
-    return send_from_directory('.', 'index.html')
+
+    user_agent = request.headers.get('User-Agent', '').lower()
+
+    # Простая проверка на мобильный браузер
+    is_mobile = any(mob in user_agent for mob in [
+        'iphone', 'android', 'blackberry', 'mobile', 'ipad', 'ipod'
+    ])
+
+    # Также можно проверить ширину экрана, если передадите в заголовках
+    # Но ширину лучше определить на клиенте
+
+    if is_mobile:
+        return send_from_directory('.', 'index_mobile.html')
+    else:
+        return send_from_directory('.', 'index.html')
 
 @app.route('/style.css')
 def style_css():

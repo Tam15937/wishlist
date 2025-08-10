@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <title>Wishlist Hub - Mobile</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js" crossorigin="anonymous"></script>
+    <style>
+        /* Основной контейнер - 2 колонки по ширине */
+		.container {
+			display: flex;
+			height: 100vh;
+			flex-direction: row;
+		}
+
+		.sidebar.left {
+			width: 40%;
+			border-right: 1px solid #ddd;
+			overflow-y: auto;
+			font-size: 1.5em; /* увеличиваем в 1.5 раза */
+		}
+
+		.right-column {
+			width: 60%;
+			display: flex;
+			flex-direction: column;
+			padding: 16px;
+			box-sizing: border-box;
+			overflow-y: auto;
+			font-size: 1.5em; /* увеличиваем в 1.5 раза */
+		}
+
+		.right-buttons {
+			display: flex;
+			gap: 10px;
+			margin-bottom: 20px;
+		}
+
+		.right-buttons button {
+			flex: 1;
+			font-size: 1.65em; /* был 1.1em, стало 1.1em * 1.5 = 1.65em */
+			padding: 15px;     /* было 10px, стало 15px */
+		}
+
+		.main-content {
+			flex: 1;
+			background: #fff;
+			padding: 15px; /* было 10px, стало 15px */
+			overflow-y: auto;
+			border: 1px solid #ddd;
+			border-radius: 5px;
+			font-size: 1.5em; /* увеличиваем в 1.5 раза */
+		}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar left" id="usersList">
+            <h2>Пользователи</h2>
+            <ul id="userItems"></ul>
+        </aside>
+
+        <div class="right-column">
+            <div class="right-buttons">
+                <button id="logoutBtn" style="background: #f44336;">Выйти</button>
+                <button id="createListBtn" style="background: #2196f3;">Создать свой лист</button>
+            </div>
+
+            <main class="main-content" id="wishlistBlock">
+                <div id="wishlistContent">
+                    <p>Выберите пользователя слева, чтобы увидеть его wishlist.</p>
+                </div>
+                <div id="deleteSection" style="margin-top: 20px;"></div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.onclick = () => {
+                document.cookie = "username=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+                document.cookie = "user_id=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+                window.location.href = '/login';
+            };
+        }
+    });
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>
